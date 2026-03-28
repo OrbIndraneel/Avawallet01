@@ -1,6 +1,5 @@
 function generateQR(){
 
-
 try{
 
 if(!wallet){
