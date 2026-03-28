@@ -353,6 +353,65 @@
     <script src="./app.js"></script>
 
     <script>
+/* ---------------- MODAL CONTROL ---------------- */
+
+function openModal(id){
+document.getElementById(id).classList.add('active')
+}
+
+function closeModal(id){
+document.getElementById(id).classList.remove('active')
+
+// reset QR on close
+if(id === 'sendModal'){
+const qr = document.getElementById('qrcode')
+qr.style.display = 'none'
+qr.innerHTML = ''
+}
+}
+
+// close when clicking outside
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+overlay.addEventListener('click', function(e){
+if(e.target === this){
+closeModal(this.id)
+}
+})
+})
+
+/* ---------------- QR FIX ---------------- */
+
+// wrap generateQR to show UI box
+const originalGenerateQR = window.generateQR
+
+if(typeof originalGenerateQR === "function"){
+window.generateQR = function(){
+
+const qrBox = document.getElementById('qrcode')
+qrBox.style.display = 'block'
+
+originalGenerateQR()
+}
+}
+
+/* ---------------- SCANNER FIX ---------------- */
+
+function safeStartScanner(){
+
+if(typeof window.startScanner === "function"){
+
+setTimeout(()=>{
+window.startScanner()
+},300)
+
+}else{
+console.error("startScanner not found")
+alert("Scanner not ready")
+}
+
+}
+
+    
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         
         function closeModal(id) { 
