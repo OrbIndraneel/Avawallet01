@@ -62,19 +62,11 @@ console.error("Generate QR Error:", e)
 alert("Something went wrong")
 }
 
-}
-function startScanner(){
+}function startScanner(){
 
 console.log("Scanner started")
 
 const scannerDiv = document.getElementById("scanner")
-
-if(!scannerDiv){
-console.error("Scanner div missing")
-return
-}
-
-// clear previous
 scannerDiv.innerHTML = ""
 
 const html5QrCode = new Html5Qrcode("scanner")
@@ -83,7 +75,12 @@ Html5Qrcode.getCameras().then(devices => {
 
 if(devices.length){
 
-const cameraId = devices[0].id
+const backCamera = devices.find(device =>
+device.label.toLowerCase().includes("back") ||
+device.label.toLowerCase().includes("rear")
+)
+
+const cameraId = backCamera ? backCamera.id : devices[0].id
 
 html5QrCode.start(
 cameraId,
@@ -99,22 +96,19 @@ try{
 const tx = JSON.parse(qrCodeMessage)
 receiveTransaction(tx)
 }catch(e){
-console.error("Invalid QR format")
+console.error("Invalid QR")
 }
 
 html5QrCode.stop()
 
 },
-error => {
-// ignore
-}
+error => {}
 )
 
 }
 
 }).catch(err => {
 console.error("Camera error:", err)
-alert("Camera not available or permission denied")
 })
 
 }
