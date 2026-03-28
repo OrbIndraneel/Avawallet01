@@ -13,6 +13,18 @@ renderTransactions()
 }
 
 }
+function getUsedTxs(){
+return JSON.parse(localStorage.getItem("usedTxs") || "[]")
+}
+
+function markTxUsed(id){
+
+let used = getUsedTxs()
+
+used.push(id)
+
+localStorage.setItem("usedTxs", JSON.stringify(used))
+}
 
 function saveTransaction(tx,type){
 
