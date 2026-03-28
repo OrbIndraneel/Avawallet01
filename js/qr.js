@@ -63,3 +63,58 @@ alert("Something went wrong")
 }
 
 }
+function startScanner(){
+
+console.log("Scanner started")
+
+const scannerDiv = document.getElementById("scanner")
+
+if(!scannerDiv){
+console.error("Scanner div missing")
+return
+}
+
+// clear previous
+scannerDiv.innerHTML = ""
+
+const html5QrCode = new Html5Qrcode("scanner")
+
+Html5Qrcode.getCameras().then(devices => {
+
+if(devices.length){
+
+const cameraId = devices[0].id
+
+html5QrCode.start(
+cameraId,
+{
+fps: 10,
+qrbox: 250
+},
+qrCodeMessage => {
+
+console.log("Scanned:", qrCodeMessage)
+
+try{
+const tx = JSON.parse(qrCodeMessage)
+receiveTransaction(tx)
+}catch(e){
+console.error("Invalid QR format")
+}
+
+html5QrCode.stop()
+
+},
+error => {
+// ignore
+}
+)
+
+}
+
+}).catch(err => {
+console.error("Camera error:", err)
+alert("Camera not available or permission denied")
+})
+
+}
