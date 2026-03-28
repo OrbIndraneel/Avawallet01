@@ -143,6 +143,10 @@ console.error("Invalid transaction")
 return
 }
 
+if(tx.to !== wallet.address){
+alert("❌ This payment is not for you")
+return
+}
 // check if already used
 const used = JSON.parse(localStorage.getItem("usedTxs") || "[]")
 
