@@ -1,5 +1,13 @@
 function generateQR(){
 
+const tx = {
+type: "payment",
+id: Date.now() + "-" + Math.random(),   // 👈 UNIQUE ID
+from: wallet.address,
+to: receiver,
+amount: amount,
+timestamp: Date.now()
+}
 try{
 
 if(!wallet){
