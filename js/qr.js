@@ -138,17 +138,28 @@ function receiveTransaction(tx){
 
 console.log("Received TX:", tx)
 
-if(!tx || !tx.amount){
+if(!tx || !tx.amount || !tx.id){
 console.error("Invalid transaction")
 return
 }
+
+// check if already used
+const used = JSON.parse(localStorage.getItem("usedTxs") || "[]")
+
+if(used.includes(tx.id)){
+alert("⚠️ This QR has already been used!")
+return
+}
+
+// mark as used
+used.push(tx.id)
+localStorage.setItem("usedTxs", JSON.stringify(used))
 
 // update balance
 balance += parseFloat(tx.amount)
 
 updateBalance()
 
-// save transaction
 saveTransaction(tx, "received")
 
 }
