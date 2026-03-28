@@ -45,3 +45,36 @@ status.style.background = "#ef4444"
 
 window.addEventListener("online", updateNetworkStatus)
 window.addEventListener("offline", updateNetworkStatus)
+// -------- MODAL CONTROL --------
+
+function openModal(id){
+const modal = document.getElementById(id)
+if(modal){
+modal.classList.add('active')
+}
+}
+
+function closeModal(id){
+const modal = document.getElementById(id)
+if(modal){
+modal.classList.remove('active')
+}
+
+// reset QR when closing send modal
+if(id === 'sendModal'){
+const qr = document.getElementById('qrcode')
+if(qr){
+qr.style.display = 'none'
+qr.innerHTML = ''
+}
+}
+}
+
+// close on outside click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+overlay.addEventListener('click', function(e){
+if(e.target === this){
+closeModal(this.id)
+}
+})
+})
