@@ -112,3 +112,21 @@ console.error("Camera error:", err)
 })
 
 }
+function receiveTransaction(tx){
+
+console.log("Received TX:", tx)
+
+if(!tx || !tx.amount){
+console.error("Invalid transaction")
+return
+}
+
+// update balance
+balance += parseFloat(tx.amount)
+
+updateBalance()
+
+// save transaction
+saveTransaction(tx, "received")
+
+}
