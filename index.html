@@ -1,97 +1,393 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Avalanche Stealth Wallet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CORE THEME --- */
+        :root {
+            --bg-deep: #050505;
+            --surface-black: #0a0a0a;
+            --surface-raised: #111111;
+            --avax-red: #E84142;
+            --avax-bright: #ff3333;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border-subtle: rgba(255, 255, 255, 0.12);
+        }
 
-<meta charset="UTF-8">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-<title>Avalanche Offline Wallet</title>
+        body, html {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
 
-<link rel="stylesheet" href="style.css">
+        .app-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 15px;
+        }
 
+        /* --- HEADER --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            flex-shrink: 0;
+        }
+
+        .brand h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+
+        #networkStatus {
+            border: 1px solid var(--border-subtle);
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        #networkStatus::before {
+            content: ''; width: 6px; height: 6px; background: var(--avax-red); border-radius: 50%; box-shadow: 0 0 10px var(--avax-red);
+        }
+
+        /* --- MAIN LAYOUT GRID --- */
+        .main-grid {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 15px;
+            overflow: hidden;
+        }
+
+        .left-col, .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* --- COMPACT WALLET CARD --- */
+        .wallet-card {
+            background-color: #000;
+            background-image: radial-gradient(100% 150% at 100% 100%, var(--avax-bright) 0%, #600000 30%, #000000 80%);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .wallet-card::after {
+            content: ''; position: absolute; top: -50%; right: 10%; width: 80px; height: 200%;
+            background: #000; transform: rotate(35deg); opacity: 0.5; filter: blur(6px); pointer-events: none;
+        }
+
+        .wallet-card-content { position: relative; z-index: 2; }
+
+        .wallet-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .wallet-header h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; text-transform: uppercase; }
+        
+        button.copy-btn {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;
+            padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 5px; transition: 0.2s;
+        }
+        button.copy-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
+
+        .balance-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.8); margin-bottom: 2px;}
+        
+        #balance { font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 10px; }
+        #address { font-family: monospace; font-size: 0.8rem; color: var(--text-muted); background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); word-break: break-all;}
+
+        /* --- SIDE-BY-SIDE ACTION BUTTONS --- */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .action-box {
+            background: var(--surface-raised);
+            border: 1px solid var(--border-subtle);
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+            border-radius: 8px 8px 0 8px;
+        }
+
+        .action-box:active { transform: scale(0.98); background: #1a1a1a; }
+        .action-box:hover { border-color: rgba(255,255,255,0.3); }
+        .action-box svg { width: 28px; height: 28px; stroke: var(--avax-red); stroke-width: 1.5; fill: none; }
+        .action-box span { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        /* --- SYNC & TX AREA --- */
+        .sync-banner {
+            background: linear-gradient(90deg, rgba(232, 65, 66, 0.15), transparent);
+            border: 1px solid var(--avax-red);
+            border-radius: 8px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .sync-banner h3 { font-size: 1.1rem; font-weight: 700; color: var(--avax-red); text-transform: uppercase; }
+        #syncStatus { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;}
+        .sync-banner svg { width: 20px; height: 20px; stroke: var(--avax-red); stroke-width: 2; fill: none; }
+
+        .tx-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface-black);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tx-header { padding: 15px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-subtle); background: #000; }
+        .tx-list-wrapper { flex-grow: 1; overflow-y: auto; padding: 15px; }
+        
+        #txList { list-style: none; }
+        #txList li { padding: 12px; border: 1px solid #222; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem; color: var(--text-muted); background: #050505; word-break: break-all;}
+
+        /* --- DESKTOP LAYOUT --- */
+        @media (min-width: 768px) {
+            .main-grid { flex-direction: row; }
+            .left-col { flex: 1; }
+            .right-col { flex: 1.2; }
+        }
+
+        /* --- MODALS & BUTTONS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-content {
+            background: #000; border: 1px solid #333; width: 100%; max-width: 400px; padding: 30px; position: relative;
+        }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff;
+            font-size: 2rem; font-weight: 300; cursor: pointer; line-height: 1;
+        }
+
+        .modal-content h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; margin-bottom: 25px; }
+
+        input {
+            width: 100%; padding: 15px; margin-bottom: 15px; background: #0a0a0a; border: 1px solid #333;
+            color: white; font-size: 1rem; font-family: 'Inter', sans-serif; outline: none; transition: 0.2s;
+        }
+        input:focus { border-color: #fff; }
+
+        button.btn-white {
+            background: #ffffff; color: #000000; border: none; padding: 15px; width: 100%;
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; text-transform: uppercase;
+            display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+            border-radius: 8px 8px 0 8px;
+        }
+        button.btn-white:active { transform: scale(0.97); background: #e0e0e0; }
+        button.btn-white svg { width: 18px; height: 18px; stroke: var(--avax-red); stroke-width: 2.5; fill: none; transition: 0.2s; }
+        button.btn-white:hover svg { transform: translateX(3px); }
+
+        /* --- CAMERA FIXES FOR HTML5-QRCODE --- */
+        #scanner {
+            background: #050505 !important;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            padding: 10px;
+        }
+        #scanner * { color: #ffffff !important; text-decoration: none !important; }
+        #scanner a { color: var(--avax-red) !important; font-weight: 600; }
+        #scanner select, #scanner button {
+            background: #1a1a1a !important;
+            border: 1px solid #444 !important;
+            padding: 10px !important;
+            border-radius: 6px !important;
+            margin: 5px 0 !important;
+            color: #fff !important;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+        }
+        #scanner button:hover { background: #333 !important; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    </style>
 </head>
-
 <body>
 
-<header>
+    <div class="app-wrapper">
+        
+        <header>
+            <div class="brand"><h1>Offline Wallet</h1></div>
+            <div id="networkStatus">Offline Mode</div>
+        </header>
 
-<h1>Avalanche Offline Wallet</h1>
+        <main class="main-grid">
+            
+            <div class="left-col">
+                
+                <div class="wallet-card">
+                    <div class="wallet-card-content">
+                        <div class="wallet-header">
+                            <h2>Avalanche</h2>
+                            <button class="copy-btn" onclick="copyAddress()">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                Copy
+                            </button>
+                        </div>
+                        
+                        <div class="balance-label">Total Balance</div>
+                        <div id="balance">0 AVAX</div>
+                        <div id="address"></div>
+                    </div>
+                </div>
 
-<div id="networkStatus">Offline Mode</div>
+                <div class="action-row">
+                    <div class="action-box" onclick="openModal('sendModal')">
+                        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <span>Send</span>
+                    </div>
+                    <div class="action-box" onclick="openModal('receiveModal')">
+                        <svg viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <span>Receive</span>
+                    </div>
+                </div>
 
-</header>
+            </div>
 
-<div class="container">
+            <div class="right-col">
+                
+                <div class="sync-banner" onclick="syncBlockchain()">
+                    <div>
+                        <h3>Sync Network</h3>
+                        <div id="syncStatus"></div>
+                    </div>
+                    <svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </div>
 
-<div class="card balanceCard">
+                <div class="tx-area">
+                    <div class="tx-header">Transaction History</div>
+                    <div class="tx-list-wrapper">
+                        <ul id="txList"></ul>
+                    </div>
+                </div>
 
-<h2>Wallet Balance</h2>
+            </div>
+        </main>
+    </div>
 
-<div id="balance">0 AVAX</div>
+    <div id="sendModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('sendModal')">&times;</button>
+            <h2>Send AVAX</h2>
+            
+            <input id="receiver" placeholder="Receiver Address">
+            <input id="amount" placeholder="Amount">
+            
+            <button class="btn-white" onclick="generateQR()">
+                Generate Payment QR
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            
+            <div id="qrcode" style="margin-top: 20px; text-align: center; background: white; padding: 15px; display: none; border-radius: 8px;"></div>
+        </div>
+    </div>
 
-<p id="address" class="address"></p>
+    <div id="receiveModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('receiveModal')">&times;</button>
+            <h2>Receive Payment</h2>
+            
+            <div id="scanner" style="width: 100%; min-height: 250px; background: #0a0a0a; border: 1px solid #333; margin-bottom: 20px;"></div>
+            
+            <button class="btn-white" onclick="safeStartScanner()">
+                Scan QR
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
 
-<button onclick="copyAddress()">Copy Address</button>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="./js/wallet.js"></script>
+    <script src="./js/qr.js"></script>
+    <script src="./js/storage.js"></script>
+    <script src="./js/blockchain.js"></script>
+    <script src="./app.js"></script>
 
-</div>
+    <script>
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        
+        function closeModal(id) { 
+            document.getElementById(id).classList.remove('active');
+            if(id === 'sendModal') {
+                document.getElementById('qrcode').style.display = 'none';
+                document.getElementById('qrcode').innerHTML = ''; 
+            }
+        }
+        
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) { if(e.target === this) closeModal(this.id); });
+        });
 
-<div class="grid">
+        // 1. Wrapper for generateQR to make the white box visible
+        const originalGenerateQR = window.generateQR; 
+        if(typeof originalGenerateQR === "function") {
+            window.generateQR = function() {
+                document.getElementById('qrcode').style.display = 'block';
+                originalGenerateQR();
+            }
+        }
 
-<div class="card sendCard">
-
-<h2>Send AVAX</h2>
-
-<input id="receiver" placeholder="Receiver Address">
-
-<input id="amount" placeholder="Amount">
-
-<button onclick="generateQR()">Generate Payment QR</button>
-
-<div id="qrcode"></div>
-
-</div>
-
-<div class="card receiveCard">
-
-<h2>Receive Payment</h2>
-
-<button onclick="startScanner()">Scan QR</button>
-
-<div id="scanner"></div>
-
-</div>
-
-</div>
-
-<div class="card historyCard">
-
-<h2>Transaction History</h2>
-
-<ul id="txList"></ul>
-
-</div>
-
-<div class="syncArea">
-
-<button onclick="syncBlockchain()">Sync With Avalanche</button>
-
-<div id="syncStatus"></div>
-
-</div>
-
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-<script src="./js/wallet.js"></script>
-<script src="./js/qr.js"></script>
-<script src="./js/storage.js"></script>
-<script src="./js/blockchain.js"></script>
-<script src="./app.js"></script>
-<script src="app.js"></script>
-
+        // 2. Wrapper for startScanner to fix the dimensional crash bug
+        function safeStartScanner() {
+            if (typeof window.startScanner === "function") {
+                // Adds a tiny 300ms delay to ensure the modal is fully drawn on the screen
+                // before the camera tries to measure the width/height of the #scanner box.
+                setTimeout(() => {
+                    window.startScanner();
+                }, 300);
+            } else {
+                console.error("startScanner function not found in your JS files!");
+            }
+        }
+    </script>
 </body>
-
 </html>
