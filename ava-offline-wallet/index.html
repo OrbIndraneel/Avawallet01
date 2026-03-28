@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Avalanche Offline Wallet</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Avalanche Offline Wallet</h1>
+
+<div id="networkStatus">Offline Mode</div>
+
+</header>
+
+<div class="container">
+
+<div class="card balanceCard">
+
+<h2>Wallet Balance</h2>
+
+<div id="balance">0 AVAX</div>
+
+<p id="address" class="address"></p>
+
+<button onclick="copyAddress()">Copy Address</button>
+
+</div>
+
+<div class="grid">
+
+<div class="card sendCard">
+
+<h2>Send AVAX</h2>
+
+<input id="receiver" placeholder="Receiver Address">
+
+<input id="amount" placeholder="Amount">
+
+<button onclick="generateQR()">Generate Payment QR</button>
+
+<div id="qrcode"></div>
+
+</div>
+
+<div class="card receiveCard">
+
+<h2>Receive Payment</h2>
+
+<button onclick="startScanner()">Scan QR</button>
+
+<div id="scanner"></div>
+
+</div>
+
+</div>
+
+<div class="card historyCard">
+
+<h2>Transaction History</h2>
+
+<ul id="txList"></ul>
+
+</div>
+
+<div class="syncArea">
+
+<button onclick="syncBlockchain()">Sync With Avalanche</button>
+
+<div id="syncStatus"></div>
+
+</div>
+
+</div>
+<script src="app.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="./js/wallet.js"></script>
+<script src="./js/qr.js"></script>
+<script src="./js/storage.js"></script>
+<script src="./js/blockchain.js"></script>
+<script src="./app.js"></script>
+
+
+</body>
+
+</html>
