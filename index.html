@@ -355,20 +355,6 @@
     <script>
 /* ---------------- MODAL CONTROL ---------------- */
 
-function openModal(id){
-document.getElementById(id).classList.add('active')
-}
-
-function closeModal(id){
-document.getElementById(id).classList.remove('active')
-
-// reset QR on close
-if(id === 'sendModal'){
-const qr = document.getElementById('qrcode')
-qr.style.display = 'none'
-qr.innerHTML = ''
-}
-}
 
 // close when clicking outside
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
