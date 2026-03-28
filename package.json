@@ -1,0 +1,20 @@
+{
+  "name": "avawallet-offline",
+  "version": "1.0.0",
+  "description": "Offline Avalanche QR Crypto Wallet",
+  "main": "app.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "start": "node backend/server.js",
+    "dev": "live-server"
+  },
+  "dependencies": {
+    "avalanche": "^3.16.0",
+    "ethers": "^6.8.0",
+    "express": "^4.18.2",
+    "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
