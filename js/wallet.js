@@ -1,5 +1,5 @@
 let wallet
-let balance = 50
+window.balance = 50
 
 function createWallet(){
 
@@ -51,9 +51,9 @@ function updateBalance(){
 
 const el = document.getElementById("balance")
 
-if(!el) return
-
+if(el){
 el.innerText = balance + " AVAX"
+}
 
 }
 
