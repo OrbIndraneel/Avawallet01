@@ -64,6 +64,20 @@ alert("Something went wrong")
 
 }function startScanner(){
 
+qrCodeMessage => {
+
+console.log("Scanned:", qrCodeMessage)
+
+try{
+const tx = JSON.parse(qrCodeMessage)
+receiveTransaction(tx)   // 👈 IMPORTANT
+}catch(e){
+console.error("Invalid QR format")
+}
+
+html5QrCode.stop()
+}
+
 console.log("Scanner started")
 
 const scannerDiv = document.getElementById("scanner")
